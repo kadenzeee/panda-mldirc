@@ -54,7 +54,7 @@ print("[INFO] Loading .dat from ", infile)
 # SET THESE PARAMS
 # ------------------------------------------------
 
-nevents = 20000000
+nevents = 200000
 time_dim = 8*64
 hist_dim = 10*8
 angle_dim = 7
@@ -68,6 +68,8 @@ LABELS = np.memmap(f"{infile}/LABELS_full.dat", dtype=np.int8,    mode='r', shap
 
 print(f"[INFO] Data size: {sys.getsizeof(TIMES)//10**6} MB")
 
+print(LABELS[0:100])
+
 # ---------------------------------------------------------------
 #
 #                       PARAMETERS
@@ -78,7 +80,7 @@ num_classes = len(class_names) # Pions or kaons?
 
 
 batch_size  = 1024 # How many events to feed to NN at a time?
-nepochs     = 50 # How many epochs?
+nepochs     = 20 # How many epochs?
 
 trainfrac   = 0.70
 valfrac     = 0.15
@@ -172,6 +174,22 @@ class BatchGenerator(keras.utils.Sequence):
     def on_epoch_end(self):
         if self.shuffle:
             np.random.shuffle(self.indices)
+
+AUTOTUNE = tf.data.AUTOTUNE
+
+def make_dataset(times, hists, angles, labels, batch_size, shuffle=True):
+    ds = tf.data.Dataset.from_tensor_slices(
+        ((times, hists, angles), labels)
+    )
+
+    if shuffle:
+        ds = ds.shuffle(buffer_size=100_000)
+
+    ds = ds.batch(batch_size)
+    ds = ds.prefetch(AUTOTUNE)
+
+    return ds
+
 
 def width_function(x, N_max, x_min):
     return N_max * np.log(1.0 / x) / np.log(1.0 / x_min)
@@ -303,21 +321,20 @@ model.compile(
 #model.summary()
 
 
-train_gen   = BatchGenerator(traintimes, trainhists, trainangles, trainlabels, batch_size=batch_size, shuffle=True)
-val_gen     = BatchGenerator(valtimes, valhists, valangles, vallabels, batch_size=batch_size, shuffle=True)
-test_gen    = BatchGenerator(testtimes, testhists, testangles, testlabels, batch_size=batch_size, shuffle=True)
-
+train_ds = make_dataset(traintimes, trainhists, trainangles, trainlabels, batch_size)
+val_ds   = make_dataset(valtimes, valhists, valangles, vallabels, batch_size, shuffle=False)
+test_ds  = make_dataset(testtimes, testhists, testangles, testlabels, batch_size, shuffle=False)
 
 model.fit(
-    train_gen,
-    validation_data=val_gen,
+    train_ds,
+    validation_data=val_ds,
     epochs=nepochs, 
     validation_freq=4
     #callbacks=[ScheduledFiLMCallback(film, nepochs)],
 )
 
 test_loss, test_acc = model.evaluate(
-    test_gen, verbose=2
+    test_ds, verbose=2
 )
 
 print('\nTest accuracy:', test_acc)

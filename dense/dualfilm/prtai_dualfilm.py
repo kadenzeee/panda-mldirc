@@ -2,9 +2,6 @@
 
 import sys, os, argparse
 
-os.environ["TF_XLA_FLAGS"] = "--tf_xla_enable_xla_devices=false"
-os.environ["TF_ENABLE_XLA"] = "0"
-
 import tensorflow as tf
 import keras
 import time
@@ -26,7 +23,7 @@ infile = args.input
 outfile = args.output
 
 # Use float32 precision throughout to avoid quantization
-tf.keras.mixed_precision.set_global_policy('float32')
+tf.keras.mixed_precision.set_global_policy('bfloat16')
 
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
@@ -329,7 +326,7 @@ model.fit(
     train_ds,
     validation_data=val_ds,
     epochs=nepochs, 
-    validation_freq=4
+    validation_freq=1
     #callbacks=[ScheduledFiLMCallback(film, nepochs)],
 )
 
@@ -349,8 +346,7 @@ while True:
         break
     i += 1
 
-# Convert model to float32 before saving to avoid quantization
-model = model.astype('float32') if hasattr(model, 'astype') else model
+
 model.save(out_name)
 print(f"Saved model to {out_name}")
 

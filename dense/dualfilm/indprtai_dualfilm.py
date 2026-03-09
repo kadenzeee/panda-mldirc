@@ -5,6 +5,8 @@ import sys, os, argparse
 os.environ["TF_XLA_FLAGS"] = "--tf_xla_enable_xla_devices=false"
 os.environ["TF_ENABLE_XLA"] = "0"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_ROCM_FUSION_ENABLE"] = "0"
+os.environ["TF_MIOPEN_USE_TENSOR_OPS"] = "0"
 
 import tensorflow as tf
 import keras
@@ -84,7 +86,7 @@ trainfrac   = 0.70
 valfrac     = 0.15
 testfrac    = 0.15
 
-datafrac    = 1  # What fraction of data to use?
+datafrac    = 0.3  # What fraction of data to use?
 # ---------------------------------------------------------------
 
 trainfrac, valfrac, testfrac = (datafrac*trainfrac, datafrac*valfrac, datafrac*testfrac)

@@ -167,7 +167,7 @@ t = keras.layers.GlobalAveragePooling1D()(t, mask=mask)
 # Histogram Data Branch
 @keras.utils.register_keras_serializable(package='Custom', name='ScaleHistograms')
 class ScaleHistograms(keras.layers.Layer):
-    def __init__(self, initial_scale=1.0, dtype='bfloat16', **kwargs):
+    def __init__(self, initial_scale=1.0, dtype='float32', **kwargs):
         super().__init__(**kwargs)
         self.initial_scale = initial_scale
         self._dtype = dtype
@@ -199,7 +199,7 @@ h = keras.layers.Dense(widths[2]//2, activation='gelu')(h)
 # Angle Data Branch
 @keras.utils.register_keras_serializable(package='Custom', name='ScaleAngles')
 class ScaleAngles(keras.layers.Layer):
-    def __init__(self, initial_scale=1.0, dtype='bfloat16', **kwargs):
+    def __init__(self, initial_scale=1.0, dtype='float32', **kwargs):
         super().__init__(**kwargs)
         self.initial_scale = initial_scale
         self._dtype = dtype
@@ -227,7 +227,7 @@ class ScaleAngles(keras.layers.Layer):
         return cfg
 
 angle_input = keras.Input(shape=(angle_dim,))
-scaled_input = ScaleAngles(initial_scale=1.0, dtype='bfloat16')(angle_input)
+scaled_input = ScaleAngles(initial_scale=1.0, dtype='float32')(angle_input)
 
 a = keras.layers.Dense(widths[3], activation='gelu')(scaled_input)
 a = keras.layers.Dense(widths[2], activation='gelu')(a)

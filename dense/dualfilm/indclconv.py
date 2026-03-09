@@ -160,6 +160,8 @@ while t.next():
 
 valid_events = write_index
 
+
+
 # ------------------------------------------------------------
 # Shrink memmaps to valid events only
 # ------------------------------------------------------------
@@ -167,11 +169,15 @@ valid_events = write_index
 if valid_events < entries:
     print(f"[INFO] Shrinking memmaps from {entries} → {valid_events} valid events")
 
+    
+
     # create new memmaps for cleaned dataset
-    HISTS_clean  = np.memmap(f"{tag}_HISTS.dat",  dtype=np.int8,    mode='w+', shape=(valid_events, nbins*npmt))
-    TIMES_clean  = np.memmap(f"{tag}_TIMES.dat",  dtype=np.float16, mode='w+', shape=(valid_events, max_photons, 2))
-    ANGLES_clean = np.memmap(f"{tag}_ANGLES.dat", dtype=np.float16, mode='w+', shape=(valid_events, 7))
-    LABELS_clean = np.memmap(f"{tag}_LABELS.dat", dtype=np.int8,    mode='w+', shape=(valid_events,))
+    HISTS_clean  = np.memmap(f"{tag}_clean_HISTS.dat",  dtype=np.int8,    mode='w+', shape=(valid_events, nbins*npmt))
+    TIMES_clean  = np.memmap(f"{tag}_clean_TIMES.dat",  dtype=np.float16, mode='w+', shape=(valid_events, max_photons, 2))
+    ANGLES_clean = np.memmap(f"{tag}_clean_ANGLES.dat", dtype=np.float16, mode='w+', shape=(valid_events, 7))
+    LABELS_clean = np.memmap(f"{tag}_clean_LABELS.dat", dtype=np.int8,    mode='w+', shape=(valid_events,))
+
+    
 
     # copy only the valid portion
     HISTS_clean[:]  = HISTS[:valid_events]

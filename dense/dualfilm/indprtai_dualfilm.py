@@ -159,7 +159,10 @@ dropout = 0.1
 # Time Data Branch
 time_input = keras.Input(shape=(max_photons, 2))
 
-mask = keras.layers.Lambda(lambda x: tf.reduce_any(tf.abs(time_input), axis=-1) > 0)(time_input)
+mask = keras.layers.Lambda(
+    lambda x: tf.reduce_sum(tf.abs(x), axis=-1) > 0,
+    output_shape=(max_photons,)
+)(time_input)
 
 t = keras.layers.Dense(widths[1], activation='gelu')(time_input)
 t = keras.layers.Dense(widths[2], activation='gelu')(t)

@@ -136,7 +136,7 @@ while t.next():
             break
     
     # 2D histogram
-    hist2d = np.histogram2d(chs, times, bins=[tedges, mcpedges])[0]
+    hist2d = np.histogram2d(times, chs, bins=[tedges, mcpedges])[0]
     
     # Momentum
     momentum = np.sqrt(event.getMomentum()[0]**2 + event.getMomentum()[1]**2 + event.getMomentum()[2]**2)
@@ -158,6 +158,38 @@ while t.next():
     
     write_index += 1
 
+valid_events = write_index
+
+# ------------------------------------------------------------
+# Shrink memmaps to valid events only
+# ------------------------------------------------------------
+
+if valid_events < entries:
+    print(f"[INFO] Shrinking memmaps from {entries} → {valid_events} valid events")
+
+    # create new memmaps for cleaned dataset
+    HISTS_clean  = np.memmap(f"{tag}_HISTS.dat",  dtype=np.int8,    mode='w+', shape=(valid_events, nbins*npmt))
+    TIMES_clean  = np.memmap(f"{tag}_TIMES.dat",  dtype=np.float16, mode='w+', shape=(valid_events, max_photons, 2))
+    ANGLES_clean = np.memmap(f"{tag}_ANGLES.dat", dtype=np.float16, mode='w+', shape=(valid_events, 7))
+    LABELS_clean = np.memmap(f"{tag}_LABELS.dat", dtype=np.int8,    mode='w+', shape=(valid_events,))
+
+    # copy only the valid portion
+    HISTS_clean[:]  = HISTS[:valid_events]
+    TIMES_clean[:]  = TIMES[:valid_events]
+    ANGLES_clean[:] = ANGLES[:valid_events]
+    LABELS_clean[:] = LABELS[:valid_events]
+
+    # flush changes to disk
+    HISTS_clean.flush()
+    TIMES_clean.flush()
+    ANGLES_clean.flush()
+    LABELS_clean.flush()
+
+    # optional: delete the old oversized memmaps from memory
+    del HISTS, TIMES, ANGLES, LABELS
+
+    # rename the cleaned memmaps to original variables if needed
+    HISTS, TIMES, ANGLES, LABELS = HISTS_clean, TIMES_clean, ANGLES_clean, LABELS_clean
 
 # ------------------------------------------------------------
 # Optional Shuffle

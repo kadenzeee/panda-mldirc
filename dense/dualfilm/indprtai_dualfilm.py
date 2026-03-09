@@ -163,6 +163,7 @@ dropout = 0.1
 
 # Time Data Branch
 time_input = keras.Input(shape=(max_photons, 2))
+time_input = keras.layers.LayerNormalization()(time_input)
 
 mask = keras.layers.Lambda(
     lambda x: tf.reduce_sum(tf.abs(x), axis=-1) > 0,

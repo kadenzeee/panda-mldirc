@@ -2,6 +2,10 @@
 
 import sys, os, argparse
 
+os.environ["TF_XLA_FLAGS"] = "--tf_xla_enable_xla_devices=false"
+os.environ["TF_ENABLE_XLA"] = "0"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
 import tensorflow as tf
 import keras
 import time
@@ -37,7 +41,6 @@ if gpus:
 
 os.environ["ROBCLAS_VERBOSE"] = "0"
 os.environ["ROCM_INFO_LEVEL"] = "0"
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 print(f"[INFO] Environment set")
 

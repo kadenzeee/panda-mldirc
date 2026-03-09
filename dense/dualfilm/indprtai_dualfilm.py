@@ -109,12 +109,22 @@ testlabels  = LABELS[valend:testend]
 AUTOTUNE = tf.data.AUTOTUNE
 
 def make_dataset(times, hists, angles, labels, batch_size, shuffle=True):
+    
+    def cast_fn(x, y):
+        t, h, a = x
+        return(tf.cast(t, tf.float32),
+               tf.cast(h, tf.float32),
+               tf.cast(a, tf.float32)), y
+    
+    
     ds = tf.data.Dataset.from_tensor_slices(
         ((times, hists, angles), labels)
     )
 
+    ds = ds.map(cast_fn, num_parallel_calls=tf.data.AUTOTUNE)
+
     if shuffle:
-        ds = ds.shuffle(buffer_size=100_000)
+        ds = ds.shuffle(buffer_size=20_000)
 
     ds = ds.batch(batch_size)
     ds = ds.prefetch(AUTOTUNE)

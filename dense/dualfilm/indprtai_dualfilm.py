@@ -70,12 +70,6 @@ LABELS = np.memmap(f"{infile}/LABELS_full.dat", dtype=np.int8,    mode='r', shap
 
 print(f"[INFO] Data size: {sys.getsizeof(TIMES)//10**6} MB")
 
-print("TIMES stats:")
-print("min:", np.min(TIMES[:100000]))
-print("max:", np.max(TIMES[:100000]))
-print("nan:", np.isnan(TIMES[:100000]).sum())
-print("inf:", np.isinf(TIMES[:100000]).sum())
-
 # ---------------------------------------------------------------
 #
 #                       PARAMETERS
@@ -165,7 +159,7 @@ dropout = 0.1
 # Time Data Branch
 time_input = keras.Input(shape=(max_photons, 2))
 
-mask = keras.layers.Lambda(lambda x: tf.reduce_any(tf.not_equal(x, 0), axis=-1))(time_input)
+mask = keras.layers.Lambda(lambda x: tf.reduce_any(tf.abs(time_input), axis=-1) > 0)(time_input)
 
 t = keras.layers.Dense(widths[1], activation='gelu')(time_input)
 t = keras.layers.Dense(widths[2], activation='gelu')(t)

@@ -70,6 +70,11 @@ LABELS = np.memmap(f"{infile}/LABELS_full.dat", dtype=np.int8,    mode='r', shap
 
 print(f"[INFO] Data size: {sys.getsizeof(TIMES)//10**6} MB")
 
+print(TIMES[0,:10])
+print(np.min(TIMES), np.max(TIMES))
+empty_events = np.where(np.sum(HISTS, axis=1) == 0)[0]
+print(empty_events)
+
 # ---------------------------------------------------------------
 #
 #                       PARAMETERS

@@ -56,7 +56,7 @@ print("[INFO] Loading .dat from ", infile)
 # SET THESE PARAMS
 # ------------------------------------------------
 
-nevents = 19940000
+nevents = 19525428
 max_photons = 128
 hist_dim = 10*8
 angle_dim = 7
@@ -69,11 +69,6 @@ ANGLES = np.memmap(f"{infile}/ANGLES_full.dat", dtype=np.float16, mode='r', shap
 LABELS = np.memmap(f"{infile}/LABELS_full.dat", dtype=np.int8,    mode='r', shape=(nevents,))
 
 print(f"[INFO] Data size: {sys.getsizeof(TIMES)//10**6} MB")
-
-print(TIMES[0,:10])
-print(np.min(TIMES), np.max(TIMES))
-empty_events = np.where(np.sum(HISTS, axis=1) == 0)[0]
-print(empty_events)
 
 # ---------------------------------------------------------------
 #
@@ -165,15 +160,10 @@ dropout = 0.1
 time_input = keras.Input(shape=(max_photons, 2))
 time_input = keras.layers.LayerNormalization()(time_input)
 
-mask = keras.layers.Lambda(
-    lambda x: tf.reduce_sum(tf.abs(x), axis=-1) > 0,
-    output_shape=(max_photons,)
-)(time_input)
-
 t = keras.layers.Dense(widths[1], activation='gelu')(time_input)
 t = keras.layers.Dense(widths[2], activation='gelu')(t)
 
-t = keras.layers.GlobalAveragePooling1D()(t, mask=mask)
+t = keras.layers.GlobalMaxPooling1D()(t)
 
 # Histogram Data Branch
 @keras.utils.register_keras_serializable(package='Custom', name='ScaleHistograms')

@@ -80,7 +80,7 @@ num_classes = len(class_names) # Pions or kaons?
 
 
 batch_size  = 1024 # How many events to feed to NN at a time?
-nepochs     = 20 # How many epochs?
+nepochs     = 8 # How many epochs?
 
 trainfrac   = 0.70
 valfrac     = 0.15
@@ -109,7 +109,6 @@ testtimes   = TIMES[valend:testend]
 testhists   = HISTS[valend:testend]
 testangles  = ANGLES[valend:testend]
 testlabels  = LABELS[valend:testend]
-
 
 AUTOTUNE = tf.data.AUTOTUNE
 
@@ -265,7 +264,6 @@ model.compile(
     loss=keras.losses.SparseCategoricalCrossentropy(),
     metrics=['accuracy']
 )
-model.summary()
 
 
 train_ds = make_dataset(traintimes, trainhists, trainangles, trainlabels, batch_size, shuffle=False)

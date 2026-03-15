@@ -142,42 +142,28 @@ def make_dataset(times, hists, angles, labels, batch_size, shuffle=True):
     return ds
 
 def batch_generator(times, hists, angles, labels, batch_size, shuffle=True):
-    """
-    Batch generator for numpy memmap datasets.
-
-    Parameters
-    ----------
-    times : np.memmap or ndarray
-        Photon time tensor (N, ...)
-    hists : np.memmap or ndarray
-        Histogram tensor (N, ...)
-    angles : np.memmap or ndarray
-        Track angle tensor (N, ...)
-    labels : np.memmap or ndarray
-        Labels (N,)
-    batch_size : int
-    shuffle : bool
-    """
 
     N = len(labels)
+    nbatches = N // batch_size
+
     indices = np.arange(N)
 
-    while True:  # infinite loop for Keras
+    if shuffle:
+        np.random.shuffle(indices)
 
-        if shuffle:
-            np.random.shuffle(indices)
+    for b in range(nbatches):
 
-        for start in range(0, N, batch_size):
+        start = b * batch_size
+        end = start + batch_size
+        batch_ids = indices[start:end]
 
-            end = start + batch_size
-            batch_ids = indices[start:end]
+        t = times[batch_ids].astype(np.float32)
+        h = hists[batch_ids].astype(np.float32)
+        a = angles[batch_ids].astype(np.float32)
+        y = labels[batch_ids]
 
-            t = times[batch_ids].astype(np.float32)
-            h = hists[batch_ids].astype(np.float32)
-            a = angles[batch_ids].astype(np.float32)
-            y = labels[batch_ids]
-
-            yield (t, h, a), y
+        yield (t, h, a), y
+        
 
 def width_function(x, N_max, x_min):
     return N_max * np.log(1.0 / x) / np.log(1.0 / x_min)

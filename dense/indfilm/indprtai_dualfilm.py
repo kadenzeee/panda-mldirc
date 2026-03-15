@@ -141,6 +141,44 @@ def make_dataset(times, hists, angles, labels, batch_size, shuffle=True):
 
     return ds
 
+def batch_generator(times, hists, angles, labels, batch_size, shuffle=True):
+    """
+    Batch generator for numpy memmap datasets.
+
+    Parameters
+    ----------
+    times : np.memmap or ndarray
+        Photon time tensor (N, ...)
+    hists : np.memmap or ndarray
+        Histogram tensor (N, ...)
+    angles : np.memmap or ndarray
+        Track angle tensor (N, ...)
+    labels : np.memmap or ndarray
+        Labels (N,)
+    batch_size : int
+    shuffle : bool
+    """
+
+    N = len(labels)
+    indices = np.arange(N)
+
+    while True:  # infinite loop for Keras
+
+        if shuffle:
+            np.random.shuffle(indices)
+
+        for start in range(0, N, batch_size):
+
+            end = start + batch_size
+            batch_ids = indices[start:end]
+
+            t = times[batch_ids].astype(np.float32)
+            h = hists[batch_ids].astype(np.float32)
+            a = angles[batch_ids].astype(np.float32)
+            y = labels[batch_ids]
+
+            yield (t, h, a), y
+
 def width_function(x, N_max, x_min):
     return N_max * np.log(1.0 / x) / np.log(1.0 / x_min)
 
@@ -276,11 +314,29 @@ train_ds = make_dataset(traintimes, trainhists, trainangles, trainlabels, batch_
 val_ds   = make_dataset(valtimes, valhists, valangles, vallabels, batch_size, shuffle=False)
 test_ds  = make_dataset(testtimes, testhists, testangles, testlabels, batch_size, shuffle=False)
 
+train_gen = batch_generator(
+    traintimes, trainhists, trainangles, trainlabels, batch_size=batch_size, shuffle=True
+)
+
+val_gen = batch_generator(
+    valtimes, valhists, valangles, vallabels, batch_size=batch_size, shuffle=False
+)
+
+test_gen = batch_generator(
+    testtimes, testhists, testangles, testlabels, batch_size=batch_size, shuffle=False
+)
+
+steps_per_epoch = len(trainlabels) // batch_size
+validation_steps = len(testlabels) // batch_size
+
+
 model.fit(
-    train_ds,
-    validation_data=val_ds,
-    epochs=nepochs, 
-    validation_freq=1
+    train_gen,
+    validation_data=val_gen,
+    epochs=nepochs,
+    steps_per_epoch=steps_per_epoch,
+    validation_steps=validation_steps,
+    validation_freq=2,
     #callbacks=[ScheduledFiLMCallback(film, nepochs)],
 )
 

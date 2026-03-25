@@ -10,6 +10,7 @@
 
 # Ignore tmp and results folders
 
+**/models/
 *.log
 **/tmp/
 **/tests/

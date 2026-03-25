@@ -5,11 +5,14 @@
 *.root
 *.pk1
 *.png
+*.dat
+*.pkl
 
 # Ignore tmp and results folders
 
 *.log
 **/tmp/
+**/tests/
 **/results/
 __pycache__/
 .ipynb_checkpoints/

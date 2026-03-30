@@ -6,6 +6,7 @@ Converts prtdirc simulation data into a format suitable for training a GNN.
 '''
 
 import argparse 
+import platform
 import time
 import ROOT             # type: ignore
 import numpy as np
@@ -23,10 +24,10 @@ parser.add_argument('-o', '--output', type=str, required=False, help='Path to ou
 args = parser.parse_args()
 
 ROOT.gInterpreter.ProcessLine('#include "../../prttools/PrtTools.h"')
-try:
-    ROOT.gSystem.Load("../../prtdirc/build/libPrt.dylib")
-except FileNotFoundError():
-    ROOT.gSystem.Load("../../prtdirc/build/libPrt.so")
+
+libbase = "../../prtdirc/build/libPrt"
+libpath = libbase + (".dylib" if platform.system()=="Darwin" else ".so")
+ROOT.gSystem.Load(libpath)
 
 # ----- Load ----- #
 

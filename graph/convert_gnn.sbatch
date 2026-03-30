@@ -13,12 +13,13 @@
 # -----------------------------
 
 INPUT_DIR=/lustre/nyx/panda/markhoff/dirc/prtdirc/macro/randhitsout5
-OUTPUT_DIR=/lustre/nyx/panda/markhoff/dirc/mldirc/graph/randhits
+OUTPUT_DIR=/lustre/nyx/panda/markhoff/dirc/mldirc/graph/data/randhits
 SIF=/lustre/nyx/panda/markhoff/containers/root/root_6.30.04-ubuntu22.04.sif
 WORKDIR=/lustre/nyx/panda/markhoff/dirc/mldirc/graph
 LOGDIR=$WORKDIR/logs
 
 mkdir -p $LOGDIR
+mkdir -p $OUTPUT_DIR
 cd $WORKDIR
 
 # -----------------------------

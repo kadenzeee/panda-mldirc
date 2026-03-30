@@ -6,7 +6,6 @@ Converts prtdirc simulation data into a format suitable for training a GNN.
 '''
 
 import argparse 
-import subprocess
 import time
 import ROOT             # type: ignore
 import numpy as np
@@ -41,6 +40,7 @@ all_globals = []
 all_labels  = []
 
 while f.next() and len(all_hits) < entries:
+    
     if not f.event().getHits():
         continue
     

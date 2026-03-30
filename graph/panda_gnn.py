@@ -141,13 +141,13 @@ if __name__ == "__main__":
     
     subprocess.run(f"mkdir -p {outdir}", shell=True)
     
-    loader = DataLoader(dataset, batch_size=32, shuffle=True)
+    loader = DataLoader(dataset, batch_size=64, shuffle=True)
     
     model = PandaGNN(node_dim=3, edge_dim=3, global_dim=4, hidden_dim=64, n_classes=2)
     optimiser = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.CrossEntropyLoss()
     
-    for epoch in range(10):
+    for epoch in range(20):
         total_loss = 0
         
         for batch in loader:

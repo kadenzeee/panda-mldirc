@@ -178,6 +178,7 @@ if __name__ == "__main__":
     from torch_geometric.loader import DataLoader
     
     if args.batch == 0:
+        print('[INFO] Running in single .pkl file mode')
         with open(args.input, "rb") as f:
             data = pickle.load(f)
         
@@ -202,6 +203,7 @@ if __name__ == "__main__":
     # ----- Load (Batch File Mode) ----- #
     
     if args.batch == 1:
+        print('[INFO] Running in batch .pkl file mode')
         dataset = PandaGNNDataset(args.input)
         
         loader = DataLoader(dataset, batch_size=64, shuffle=True, num_workers=4)

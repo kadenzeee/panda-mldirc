@@ -233,7 +233,7 @@ if __name__ == "__main__":
     for epoch in range(20):
         total_loss = 0
         
-        pbar = tqdm(loader, desc=f'Epoch {epoch}')
+        pbar = tqdm.tqdm(loader, desc=f'Epoch {epoch}')
         prev_time = time.time()
         
         for batch in loader:

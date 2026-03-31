@@ -113,7 +113,7 @@ import os
 from collections import OrderedDict
 
 class PandaGNNDataset(Dataset):
-    def __init__(self, folder, cache_size=3):
+    def __init__(self, folder, cache_size=5):
         self.files = sorted([
             os.path.join(folder, f)
             for f in os.listdir(folder)
@@ -229,7 +229,7 @@ if __name__ == "__main__":
         print('[INFO] Running in batch .pkl file mode')
         dataset = PandaGNNDataset(args.input)
         
-        loader = DataLoader(dataset, batch_size=64, shuffle=True, num_workers=4)
+        loader = DataLoader(dataset, batch_size=64, shuffle=False, num_workers=4)
     
     # ----- Training Loop ----- #
     # -----      Save     ----- #

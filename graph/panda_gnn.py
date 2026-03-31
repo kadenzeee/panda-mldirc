@@ -110,9 +110,10 @@ from torch.utils.data import Dataset
 from torch_geometric.data import Data
 import pickle
 import os
+from collections import OrderedDict
 
 class PandaGNNDataset(Dataset):
-    def __init__(self, folder):
+    def __init__(self, folder, cache_size=3):
         self.files = sorted([
             os.path.join(folder, f)
             for f in os.listdir(folder)
@@ -121,34 +122,52 @@ class PandaGNNDataset(Dataset):
         
         # Build index: (file_id, event_id)
         self.index = []
+        self.file_event_counts = []
         
         for file_id, file in enumerate(self.files):
             with open(file, 'rb') as f:
                 data = pickle.load(f)
                 nevents = len(data['labels'])
             
+            self.file_event_counts.append(nevents)
+            
             for i in range(nevents):
                 self.index.append((file_id, i))
         
         # Assign cache for currently loaded files
-        self.current_file_id = None
-        self.current_data = None
+        self.cache = OrderedDict()
+        self.cache_size = cache_size
     
     def __len__(self):
         return len(self.index)
     
     def load_file(self, file_id):
-        if self.current_file_id != file_id:
-            with open(self.files[file_id], 'rb') as f:
-                self.current_data = pickle.load(f)
-            self.current_file_id = file_id
+        '''
+        Implements LRU cache for .pkl files.
+        '''
+        # Already in cache
+        if file_id in self.cache:
+            self.cache.move_to_end(file_id)
+            return self.cache[file_id]
+        
+        # Not in cache, need to load
+        with open(self.files[file_id], 'rb') as f:
+            data = pickle.load(f)
+        
+        # Add to cache
+        self.cache[file_id] = data
+        self.cache.move_to_end(file_id)
+        
+        # Evict least recently used if cache exceeds size
+        if len(self.cache) > self.cache_size:
+            self.cache.popitem(last=False)
+        
+        return data
     
     def __getitem__(self, idx):
         file_id, event_id = self.index[idx]
         
-        self.load_file(file_id)
-        
-        data = self.current_data
+        data = self.load_file(file_id)
         
         x           = torch.tensor(data['nodes'][event_id],         dtype=torch.float)
         edge_index  = torch.tensor(data['edges'][event_id].T,       dtype=torch.long)

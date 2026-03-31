@@ -7,6 +7,10 @@ python panda_gnn.py -i dataset.pkl -o models
 '''
 
 import torch
+import subprocess
+
+subprocess.run("pip install --user torch-geometric", shell=True)
+subprocess.run("pip install tqdm", shell=True)
 
 # ----- MLP Layer ----- #
 
@@ -211,7 +215,7 @@ if __name__ == "__main__":
     # ----- Training Loop ----- #
     # -----      Save     ----- #
     
-    import subprocess,datetime
+    import datetime, tqdm, time
     
     n = 1
     while True:
@@ -229,7 +233,16 @@ if __name__ == "__main__":
     for epoch in range(20):
         total_loss = 0
         
+        pbar = tqdm(loader, desc=f'Epoch {epoch}')
+        prev_time = time.time()
+        
         for batch in loader:
+            now = time.time()
+            data_time = now - prev_time
+            t1 = time.time()
+            
+            # ----- Compute ----- #
+            
             optimiser.zero_grad()
             
             out = model(batch)
@@ -239,6 +252,17 @@ if __name__ == "__main__":
             optimiser.step()
             
             total_loss += loss.item()
+            
+            # -----   ...   ----- #
+            
+            t2 = time.time()
+            pbar.set_postfix({
+                'loss': f"{loss.item():.3f}",
+                'load': f"{data_time:.2f}s",
+                'compute': f"{(t2 - t1):.2f}s"
+            })
+            
+            prev_time = time.time()
         
         print(f'Epoch {epoch}, Loss: {total_loss:.4f}')
         torch.save(model.state_dict(), f"{outdir}/weights__epoch-{epoch}__loss-{total_loss:.4f}.pt")

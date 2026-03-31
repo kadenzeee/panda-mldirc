@@ -236,7 +236,7 @@ if __name__ == "__main__":
         pbar = tqdm.tqdm(loader, desc=f'Epoch {epoch}')
         prev_time = time.time()
         
-        for batch in loader:
+        for batch in pbar:
             now = time.time()
             data_time = now - prev_time
             t1 = time.time()
@@ -257,7 +257,6 @@ if __name__ == "__main__":
             
             t2 = time.time()
             pbar.set_postfix({
-                'loss': f"{loss.item():.3f}",
                 'load': f"{data_time:.2f}s",
                 'compute': f"{(t2 - t1):.2f}s"
             })

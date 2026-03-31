@@ -135,7 +135,7 @@ class PandaGNNDataset(Dataset):
     
     def load_file(self, file_id):
         if self.current_file_id != file_id:
-            with open(self.files[file_id]) as f:
+            with open(self.files[file_id], 'rb') as f:
                 self.current_data = pickle.load(f)
             self.current_file_id = file_id
     

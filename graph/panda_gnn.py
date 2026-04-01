@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+subprocess.run("pip install --user torch-geometric", shell=True)
+
 '''
 Defines and trains GNN model for PANDA Barrel DIRC.
 
@@ -8,9 +11,6 @@ python panda_gnn.py -i dataset.pkl -o models
 
 import torch
 import subprocess
-
-subprocess.run("pip install --user torch-geometric", shell=True)
-subprocess.run("pip install tqdm", shell=True)
 
 # ----- MLP Layer ----- #
 
@@ -174,6 +174,13 @@ class PandaGNNDataset(Dataset):
         edge_attr   = torch.tensor(data['edge_features'][event_id], dtype=torch.float)
         y           = torch.tensor([data['labels'][event_id]],      dtype=torch.long)
         g           = torch.tensor(data['globals'][event_id],       dtype=torch.float)
+        
+        # Reshapes in case the event was empty for whatever reason, to ensure correct dimensions for batching
+        if edge_index.numel() == 0:
+            edge_index = torch.empty((2, 0), dtype=torch.long)
+        
+        if edge_attr.numel() == 0:
+            edge_attr = torch.empty((0, 3), dtype=torch.float)
         
         graph = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y)
         graph.global_features = g

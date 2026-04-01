@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import subprocess
 subprocess.run("pip install --user torch-geometric", shell=True)
 
 '''
@@ -10,7 +10,6 @@ python panda_gnn.py -i dataset.pkl -o models
 '''
 
 import torch
-import subprocess
 
 # ----- MLP Layer ----- #
 

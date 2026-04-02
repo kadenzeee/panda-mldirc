@@ -45,6 +45,9 @@ while f.next() and len(all_hits) < entries:
     if not f.event().getHits():
         continue
     
+    if f.event().getMomentum()[0] == 0 or f.event().getMomentum()[1] == 0 or f.event().getMomentum()[2] == 0:
+        continue
+    
     # ------ PID ----- #
     
     pid = f.event().getPid() - 2 # minus 2 because prtdirc simulation labels Pi+ : 2 and Kaon+ : 3

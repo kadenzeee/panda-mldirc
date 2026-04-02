@@ -250,7 +250,7 @@ if __name__ == "__main__":
     
     subprocess.run(f"mkdir -p {outdir}", shell=True)
     
-    model = PandaGNN(node_dim=3, edge_dim=3, global_dim=4, hidden_dim=64, n_classes=2)
+    model = PandaGNN(node_dim=3, edge_dim=3, global_dim=7, hidden_dim=64, n_classes=2)
     optimiser = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.CrossEntropyLoss()
     

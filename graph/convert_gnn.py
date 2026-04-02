@@ -52,13 +52,17 @@ while f.next() and len(all_hits) < entries:
     # ------ Track ----- #
     
     track_pos   = f.event().getPosition()
-    t0          = 0              # impingement time
+    t0          = 0              # impingement time (always zero in simulation)
+    p           = f.event().getMomentum()
     
     track_features = np.array([
         track_pos[0],
         track_pos[1],
         track_pos[2],
-        t0
+        t0,
+        p[0],
+        p[1],
+        p[2]
     ])
     
     # ----- Hits ----- # 

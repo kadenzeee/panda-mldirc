@@ -10,6 +10,8 @@ python panda_gnn.py -i dataset.pkl -o models
 import torch
 import subprocess
 
+torch.multiprocessing.set_sharing_strategy('file_system')
+
 # ----- MLP Layer ----- #
 
 import torch.nn as nn

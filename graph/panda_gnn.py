@@ -273,7 +273,9 @@ if __name__ == "__main__":
             
             optimiser.zero_grad()
             
-            out = model(batch)
+            with torch.autocast(device_type="cuda", dtype=torch.float16):
+                out = model(batch)
+            
             loss = loss_fn(out, batch.y.view(-1))
             
             loss.backward()

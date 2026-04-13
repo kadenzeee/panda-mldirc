@@ -237,7 +237,7 @@ if __name__ == "__main__":
         print('[INFO] Running in batch .pkl file mode')
         dataset = PandaGNNDataset(args.input)
         
-        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=6, prefetch_factor=2, persistent_workers=True, pin_memory=True)
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=6, prefetch_factor=2, persistent_workers=True)
     
     # ----- Training Loop ----- #
     # -----      Save     ----- #

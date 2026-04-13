@@ -198,8 +198,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='panda_gnn', description='Defines and trains GNN model for PANDA Barrel DIRC.')
     
     parser.add_argument('-i', '--input', type=str, required=True, help='Path to input pickle file\\s.')
-    parser.add_argument('-o', '--output', type=str, required=False, default='tmp', help='Path to output model file')
-    parser.add_argument('--batch', action='store_true', help='Load .pkl inputs in batch mode (0) or single file mode (1)')
+    parser.add_argument('-o', '--output', type=str, required=False, default='tmp', help='Path to output model file.')
+    parser.add_argument('-batch-size', '--batch-size', type=int, default=64, help='Data batch size for training.')
+    parser.add_argument('--batch', action='store_true', help='Load .pkl inputs in batch mode (0) or single file mode (1).')
     
     args = parser.parse_args()
     
@@ -228,7 +229,7 @@ if __name__ == "__main__":
             
             dataset.append(graph)
         
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
     
     # ----- Load (Batch File Mode) ----- #
     
@@ -236,7 +237,7 @@ if __name__ == "__main__":
         print('[INFO] Running in batch .pkl file mode')
         dataset = PandaGNNDataset(args.input)
         
-        loader = DataLoader(dataset, batch_size=64, shuffle=False, num_workers=6, prefetch_factor=2, persistent_workers=True)
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=6, prefetch_factor=2, persistent_workers=True)
     
     # ----- Training Loop ----- #
     # -----      Save     ----- #

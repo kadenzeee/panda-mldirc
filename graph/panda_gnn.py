@@ -267,14 +267,13 @@ if __name__ == "__main__":
         for batch in pbar:
             now = time.time()
             data_time = now - prev_time
-            t1 = time.time()
+            t1 = time.time()       
             
             # ----- Compute ----- #
             
             optimiser.zero_grad()
             
-            with torch.autocast(device_type="cuda", dtype=torch.float16):
-                out = model(batch)
+            out = model(batch)
             
             loss = loss_fn(out, batch.y.view(-1))
             

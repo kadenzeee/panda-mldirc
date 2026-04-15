@@ -20,6 +20,9 @@ parser = argparse.ArgumentParser(prog='convert_gnn',
 
 parser.add_argument('-i', '--input', type=str, required=True, help='Path to input ROOT file.')
 parser.add_argument('-o', '--output', type=str, required=False, help='Path to output .npz file')
+parser.add_argument('-tadj', '--threshold-time-adjacency', type = float, default=15.0, help='Time threshold for edge adjacency of photons (ns). Default: 50.0')
+parser.add_argument('-radj', '--threshold-radial-adjacency', type=float, default=350.0, help='Radial distance threshold for edge adjacency of photons (mm). Default: 350.0')
+parser.add_argument('--verbose', action='store_true', help='Print verbose output during edge construction.')
 
 args = parser.parse_args()
 
@@ -97,7 +100,7 @@ while f.next() and len(all_hits) < entries:
 
 # ----- Edges ----- #
 
-def build_edges(nodes, radius=50.0, alpha=1.0):
+def build_edges(nodes, radj=args.threshold_radial_adjacency,  tadj=args.threshold_time_adjacency):
     edges = []
     edge_features = []
     
@@ -112,9 +115,9 @@ def build_edges(nodes, radius=50.0, alpha=1.0):
             dy = nodes[j][1] - nodes[i][1]
             dt = nodes[j][2] - nodes[i][2]
             
-            distsq = dx*dx + dy*dy + alpha * dt*dt
+            distsq = dx*dx + dy*dy
 
-            if distsq < radius*radius:
+            if distsq < radj*radj and abs(dt) < tadj:
                 edges.append([i, j])
                 edge_features.append([dx, dy, dt])
                 
@@ -127,6 +130,12 @@ for nodes in all_hits:
     e, ef = build_edges(nodes)
     all_edges.append(e)
     all_edge_features.append(ef)
+
+if args.verbose:
+    for event in range(len(all_hits)):
+        print(f'Event {event}: {len(all_hits[event])} nodes, {len(all_edges[event])} edges')
+        print(f'{len(all_hits[event]) * (len(all_hits[event]) - 1) - len(all_edges[event])} edges deleted out of {len(all_hits[event]) * (len(all_hits[event]) - 1)} possible edges ({100.0 * (1 - len(all_edges[event]) / (len(all_hits[event]) * (len(all_hits[event]) - 1))):.2f}% sparsity)')
+        print('---')
 
 # ----- Save to .pkl ----- #
 

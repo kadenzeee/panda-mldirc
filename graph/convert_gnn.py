@@ -23,6 +23,7 @@ parser.add_argument('-o', '--output', type=str, required=False, help='Path to ou
 parser.add_argument('-tadj', '--threshold-time-adjacency', type = float, default=15.0, help='Time threshold for edge adjacency of photons (ns). Default: 50.0')
 parser.add_argument('-radj', '--threshold-radial-adjacency', type=float, default=350.0, help='Radial distance threshold for edge adjacency of photons (mm). Default: 350.0')
 parser.add_argument('--verbose', action='store_true', help='Print verbose output during edge construction.')
+parser.add_argument('--save-sparsities', action='store_true', help='Save sparsity of each event to sparsities.csv')
 
 args = parser.parse_args()
 
@@ -136,6 +137,13 @@ if args.verbose:
         print(f'Event {event}: {len(all_hits[event])} nodes, {len(all_edges[event])} edges')
         print(f'{len(all_hits[event]) * (len(all_hits[event]) - 1) - len(all_edges[event])} edges deleted out of {len(all_hits[event]) * (len(all_hits[event]) - 1)} possible edges ({100.0 * (1 - len(all_edges[event]) / (len(all_hits[event]) * (len(all_hits[event]) - 1))):.2f}% sparsity)')
         print('---')
+
+if args.save_sparsities:
+    with open(f'sparsities-tadj{args.threshold_time_adjacency}-radj{args.threshold_radial_adjacency}.csv', 'w') as f:
+        f.write('event,sparsity\n')
+        for event in range(len(all_hits)):
+            sparsity = 100.0 * (1 - len(all_edges[event]) / (len(all_hits[event]) * (len(all_hits[event]) - 1)))
+            f.write(f'{event},{sparsity:.2f}\n')
 
 # ----- Save to .pkl ----- #
 

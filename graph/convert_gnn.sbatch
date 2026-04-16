@@ -5,7 +5,7 @@
 #SBATCH --error=logs/gnnclconv_%A_%a.err
 #SBATCH --time=01:00:00
 #SBATCH --partition=long
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --array=0-99
 
 # -----------------------------

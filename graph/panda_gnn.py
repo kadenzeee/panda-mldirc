@@ -262,6 +262,8 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
     
+    print(f'[INFO] Starting training on device: {device}')
+    
     for epoch in range(20):
         total_loss = 0
         

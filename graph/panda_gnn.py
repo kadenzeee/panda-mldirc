@@ -258,6 +258,9 @@ if __name__ == "__main__":
     optimiser = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.CrossEntropyLoss()
     
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
+    
     for epoch in range(20):
         total_loss = 0
         
@@ -265,6 +268,9 @@ if __name__ == "__main__":
         prev_time = time.time()
         
         for batch in pbar:
+            
+            batch = batch.to(device)
+            
             now = time.time()
             data_time = now - prev_time
             t1 = time.time()       

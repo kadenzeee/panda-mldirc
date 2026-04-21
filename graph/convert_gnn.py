@@ -155,8 +155,15 @@ data = {
     "labels": all_labels                # (N_events,)
 }
 
-import pickle
+import pickle, json
 
 outfilename = args.output if args.output is not None else "gnn_data.pkl"
 with open(outfilename, "wb") as f:
     pickle.dump(data, f)
+
+with open(outfilename.replace('.pkl', '_header.json'), 'w') as f:
+    json.dump({
+        "nnodes" : [len(hits) for hits in all_hits],
+        "nedges" : [len(edges) for edges in all_edges],
+        "nevents" : len(all_hits)
+    })

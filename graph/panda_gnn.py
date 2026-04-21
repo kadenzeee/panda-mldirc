@@ -185,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', type=str, required=False, default='tmp', help='Path to output model file.')
     parser.add_argument('-batch-size', '--batch-size', type=int, default=64, help='Data batch size for training.')
     parser.add_argument('--batch', action='store_true', help='Load .pkl inputs in batch mode (0) or single file mode (1).')
-    parser.add_argument('--nevents', type=int, default=None, help='Number of events to load from each .pkl file.')
+    parser.add_argument('-nevents', '--nevents', type=int, default=None, help='Number of events to load from each .pkl file.')
     
     args = parser.parse_args()
     

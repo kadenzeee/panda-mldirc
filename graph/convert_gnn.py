@@ -166,4 +166,4 @@ with open(outfilename.replace('.pkl', '_header.json'), 'w') as f:
         "nnodes" : [len(hits) for hits in all_hits],
         "nedges" : [len(edges) for edges in all_edges],
         "nevents" : len(all_hits)
-    })
+    }, f)

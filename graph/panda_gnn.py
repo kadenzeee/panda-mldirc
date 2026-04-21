@@ -114,6 +114,12 @@ from collections import OrderedDict
 
 class PandaGNNDataset(Dataset):
     def __init__(self, folder, cache_size=5, nevents=None):
+        
+        '''
+        Cache; NOT IMPLEMENTED
+        '''
+        
+        
         self.files = sorted([
             os.path.join(folder, f)
             for f in os.listdir(folder)
@@ -122,19 +128,34 @@ class PandaGNNDataset(Dataset):
         
         # Build index: (file_id, event_id)
         self.index = []
-        self.file_event_counts = []
+        total = 0
         
+        print(f'[INFO] Counting events in each file to build index...')
+            
         for file_id, file in enumerate(self.files):
             with open(file, 'rb') as f:
                 data = pickle.load(f)
-                nevents = len(data['labels']) if nevents is None else nevents
+                n_file_events = len(data['labels'])
             
-            self.file_event_counts.append(nevents)
-            
-            for i in range(nevents):
-                self.index.append((file_id, i))
+            if nevents is None:
+                
+                for i in range(nevents):
+                    self.index.append((file_id, i))
+            else:
+                remaining = nevents - total
+                if remaining <= 0:
+                    break
+                
+                take = min(remaining, n_file_events)
+                
+                for i in range(take):
+                    self.index.append((file_id, i))
+                
+                total += take
         
-        # Assign cache for currently loaded files
+        
+        self.cache_size = cache_size
+        
         self._current_file_id = None
         self._current_data = None
     

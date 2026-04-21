@@ -146,7 +146,7 @@ class PandaGNNDataset(Dataset):
             
             if nevents is None:
                 
-                for i in range(nevents):
+                for i in range(n_file_events):
                     self.index.append((file_id, i))
             else:
                 

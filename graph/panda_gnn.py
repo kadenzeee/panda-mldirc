@@ -134,7 +134,10 @@ class PandaGNNDataset(Dataset):
         print(f'[INFO] Counting events in each file to build index...')
         
         data_bar = tqdm.tqdm(enumerate(self.files), total=len(self.files), desc='Building dataset index')
-        
+
+        if nevents is None: print(f'[INFO] -nevents not specified, counting...'); 
+        else: print(f'[INFO] -nevents specified as {nevents}, taking min({nevents}, n_file_events) events from each file.');
+
         for file_id, file in data_bar:
             with open(file, 'rb') as f:
                 data = pickle.load(f)
@@ -142,13 +145,9 @@ class PandaGNNDataset(Dataset):
             
             if nevents is None:
                 
-                print(f'[INFO] -nevents not specified, counting...')
-                print(f'[INFO] Supply -nevents {n_file_events} to speed up loading in future runs.')
-                
                 for i in range(nevents):
                     self.index.append((file_id, i))
             else:
-                print(f'[INFO] -nevents specified as {nevents}, taking min({nevents}, {n_file_events}) events from each file.')
                 
                 remaining = nevents - total
                 if remaining <= 0:
@@ -161,6 +160,8 @@ class PandaGNNDataset(Dataset):
                 
                 total += take
         
+        
+        print(f'[INFO] Supply -nevents {n_file_events} to speed up loading in future runs.')
         
         self.cache_size = cache_size
         

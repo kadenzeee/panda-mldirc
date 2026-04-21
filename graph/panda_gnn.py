@@ -110,6 +110,7 @@ from torch.utils.data import Dataset
 from torch_geometric.data import Data
 import pickle
 import os
+import tqdm
 from collections import OrderedDict
 
 class PandaGNNDataset(Dataset):
@@ -256,7 +257,7 @@ if __name__ == "__main__":
     # ----- Training Loop ----- #
     # -----      Save     ----- #
     
-    import datetime, tqdm, time
+    import datetime, time
     
     n = 1
     while True:

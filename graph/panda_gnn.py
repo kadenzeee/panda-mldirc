@@ -113,7 +113,7 @@ import os
 from collections import OrderedDict
 
 class PandaGNNDataset(Dataset):
-    def __init__(self, folder, cache_size=5):
+    def __init__(self, folder, cache_size=5, nevents=None):
         self.files = sorted([
             os.path.join(folder, f)
             for f in os.listdir(folder)
@@ -127,7 +127,7 @@ class PandaGNNDataset(Dataset):
         for file_id, file in enumerate(self.files):
             with open(file, 'rb') as f:
                 data = pickle.load(f)
-                nevents = len(data['labels'])
+                nevents = len(data['labels']) if nevents is None else nevents
             
             self.file_event_counts.append(nevents)
             
@@ -135,39 +135,23 @@ class PandaGNNDataset(Dataset):
                 self.index.append((file_id, i))
         
         # Assign cache for currently loaded files
-        self.cache = OrderedDict()
-        self.cache_size = cache_size
+        self._current_file_id = None
+        self._current_data = None
     
     def __len__(self):
         return len(self.index)
     
     def load_file(self, file_id):
-        '''
-        Implements LRU cache for .pkl files.
-        '''
-        # Already in cache
-        if file_id in self.cache:
-            self.cache.move_to_end(file_id)
-            return self.cache[file_id]
-        
-        # Not in cache, need to load
-        with open(self.files[file_id], 'rb') as f:
-            data = pickle.load(f)
-        
-        # Add to cache
-        self.cache[file_id] = data
-        self.cache.move_to_end(file_id)
-        
-        # Evict least recently used if cache exceeds size
-        if len(self.cache) > self.cache_size:
-            self.cache.popitem(last=False)
-        
-        return data
+        if self._current_file_id != file_id:
+            with open(self.files[file_id], 'rb') as f:
+                self._current_data = pickle.load(f)
+            self._current_file_id = file_id
     
     def __getitem__(self, idx):
         file_id, event_id = self.index[idx]
         
-        data = self.load_file(file_id)
+        self.load_file(file_id)
+        data = self._current_data
         
         x           = torch.tensor(data['nodes'][event_id],         dtype=torch.float)
         edge_index  = torch.tensor(data['edges'][event_id].T,       dtype=torch.long)
@@ -201,6 +185,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', type=str, required=False, default='tmp', help='Path to output model file.')
     parser.add_argument('-batch-size', '--batch-size', type=int, default=64, help='Data batch size for training.')
     parser.add_argument('--batch', action='store_true', help='Load .pkl inputs in batch mode (0) or single file mode (1).')
+    parser.add_argument('--nevents', type=int, default=None, help='Number of events to load from each .pkl file.')
     
     args = parser.parse_args()
     
@@ -235,7 +220,7 @@ if __name__ == "__main__":
     
     if args.batch == 1:
         print('[INFO] Running in batch .pkl file mode')
-        dataset = PandaGNNDataset(args.input)
+        dataset = PandaGNNDataset(args.input, nevents=args.nevents)
         print(f'[INFO] Dataset class initialised with {len(dataset)} events across {len(dataset.files)} files. Cache size: {dataset.cache_size} files.')
         loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=0, prefetch_factor=1, persistent_workers=False)
         print(f'[INFO] DataLoader initialised with batch size {args.batch_size}.')

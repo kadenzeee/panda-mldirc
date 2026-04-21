@@ -131,8 +131,10 @@ class PandaGNNDataset(Dataset):
         total = 0
         
         print(f'[INFO] Counting events in each file to build index...')
-            
-        for file_id, file in enumerate(self.files):
+        
+        data_bar = tqdm.tqdm(self.files, desc='Building index')
+        
+        for file_id, file in data_bar:
             with open(file, 'rb') as f:
                 data = pickle.load(f)
                 n_file_events = len(data['labels'])

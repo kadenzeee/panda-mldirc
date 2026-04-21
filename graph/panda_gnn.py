@@ -237,7 +237,7 @@ if __name__ == "__main__":
         print('[INFO] Running in batch .pkl file mode')
         dataset = PandaGNNDataset(args.input)
         print(f'[INFO] Dataset class initialised with {len(dataset)} events across {len(dataset.files)} files. Cache size: {dataset.cache_size} files.')
-        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, prefetch_factor=2, persistent_workers=True)
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=0, prefetch_factor=1, persistent_workers=False)
         print(f'[INFO] DataLoader initialised with batch size {args.batch_size}.')
     
     # ----- Training Loop ----- #

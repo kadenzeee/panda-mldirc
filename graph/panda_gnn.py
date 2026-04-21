@@ -133,7 +133,7 @@ class PandaGNNDataset(Dataset):
         
         print(f'[INFO] Counting events in each file to build index...')
         
-        data_bar = tqdm.tqdm(self.files, desc='Building dataset index')
+        data_bar = tqdm.tqdm(enumerate(self.files), total=len(self.files), desc='Building dataset index')
         
         for file_id, file in data_bar:
             with open(file, 'rb') as f:

@@ -61,15 +61,17 @@ while f.next() and len(all_hits) < entries:
     track_pos   = f.event().getPosition()
     t0          = 0              # impingement time (always zero in simulation)
     p           = f.event().getMomentum()
+    mag_p       = np.sqrt(p[0]**2 + p[1]**2 + p[2]**2)
     
     track_features = np.array([
         track_pos[0],
         track_pos[1],
         track_pos[2],
         t0,
-        p[0],
-        p[1],
-        p[2]
+        mag_p,
+        p[0]/mag_p,
+        p[1]/mag_p,
+        p[2]/mag_p
     ])
     
     # ----- Hits ----- # 

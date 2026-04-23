@@ -81,7 +81,7 @@ if __name__ == "__main__":
         
         dataset.append(graph)
     
-    model = PandaGNN(node_dim=3, edge_dim=3, global_dim=7, hidden_dim=64, n_classes=2)
+    model = PandaGNN(node_dim=3, edge_dim=3, global_dim=8, hidden_dim=64, n_classes=2)
     model = torch.compile(model)
     model.load_state_dict(torch.load(args.model_input))
     

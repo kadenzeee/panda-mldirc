@@ -216,6 +216,7 @@ if __name__ == "__main__":
     parser.add_argument('-batch-size', '--batch-size', type=int, default=64, help='Data batch size for training.')
     parser.add_argument('--batch', action='store_true', help='Load .pkl inputs in batch mode (0) or single file mode (1).')
     parser.add_argument('-nevents', '--nevents', type=int, default=None, help='Number of events to load from each .pkl file.')
+    parser.add_argument('-nepochs', '--nepochs', type=int, default=20, help='Number of training epochs.')
     
     args = parser.parse_args()
     
@@ -279,7 +280,7 @@ if __name__ == "__main__":
     
     print(f'[INFO] Starting training on device: {device}')
     
-    for epoch in range(20):
+    for epoch in range(args.nepochs):
         total_loss = 0
         
         pbar = tqdm.tqdm(loader, desc=f'Epoch {epoch}')

@@ -1,6 +1,0 @@
-This folder builds upon the previous TBinnedHist by including angular information, along with smearing for each of these quantities, 
-and introduces time smearing.
-
-It also trials a FiLM network (Feature-wise Linear Modulation, Perez et al. 2018). This means that the network learns how much to amplify or suppress
-each histogram feature depending on the incidence angle. Perhaps for shallow angles, certain channels are weighted less, or perhaps certain photon hit 
-times are weighted less. 
